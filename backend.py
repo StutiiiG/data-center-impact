@@ -200,5 +200,6 @@ def test():
 
 # --- Main entry ---
 if __name__ == '__main__':
-    print("Starting Flask server on http://127.0.0.1:3000...")
-    app.run(debug=True, port=3000, use_reloader=False)
+    import os
+    port = int(os.environ.get('PORT', 3000))
+    app.run(host='0.0.0.0', port=port, debug=True)
