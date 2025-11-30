@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Air Quality & Data Centers Map</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/daisyui@3.3.1/dist/full.css" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hidden; background:#111827; }
+#map { position:absolute; top:90px; bottom:0; right:0; left:0; }
+
+/* Monitor Panel */
+#monitor-panel {
+  position:absolute; top:50%; left:10px; transform:translateY(-50%);
+  background:rgba(30,41,59,0.95); color:#fff; padding:12px 16px;
+  border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5); z-index:500;
+  font-size:0.9rem; display:flex; flex-direction:column; gap:4px;
+}
+
+/* Data Center Info Tab */
+#dc-info-tab {
+  position:absolute; top:calc(50% - 200px); left:10px; transform:translateY(-50%);
+  background:rgba(15,42,66,0.95); color:#fff; padding:12px 16px;
+  border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.5); z-index:510;
+  width:240px; display:none; flex-direction:column; gap:6px; font-size:0.85rem;
+  cursor:pointer;
+}
+#dc-info-tab div { display:flex; align-items:center; gap:6px; }
+#dc-info-tab .dc-icon-small { width:18px; display:inline-block; text-align:center; }
+
+/* Expanded infographic style */
+#dc-info-tab.large {
+  width:400px;
+  height:500px;
+  top:50px;
+  left:50%;
+  transform:translateX(-50%);
+  overflow-y:auto;
+  font-size:1rem;
+  padding:20px;
+  flex-direction:column;
+  gap:12px;
+}
+#dc-info-tab #close-dc-tab {
+  align-self:flex-end;
+  background:transparent;
+  border:none;
+  color:#fff;
+  font-size:1.2rem;
+  cursor:pointer;
+}
+
+/* More Insights panel for Water */
+#more-insights {
+  position:absolute;
+  top:50%;
+  left:10px;
+  transform:translateY(-50%);
+  background:rgba(30,41,59,0.95);
+  color:#fff;
+  padding:10px 12px;
+  border-radius:10px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+  z-index:510;
+  display:none;
+  flex-direction:column;
+  gap:8px;
+  font-size:0.85rem;
+}
+#more-insights .insight-item { cursor:pointer; display:flex; align-items:center; gap:6px; }
+
+/* Central Graph Panel */
+#insight-graph-panel {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  width:500px;
+  height:400px;
+  background:rgba(15,42,66,0.95);
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+  color:#fff;
+  display:none;
+  flex-direction:column;
+  z-index:600;
+  padding:20px;
+}
+#insight-graph-panel #close-graph-panel {
+  align-self:flex-end;
+  background:transparent;
+  border:none;
+  color:#fff;
+  font-size:1.2rem;
+  cursor:pointer;
+}
+#graph-placeholder {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  border:2px dashed #6EC1E4; color:#6EC1E4;
+}
+
+/* Footer & Ribbon */
+#footer-timestamp { position:absolute; bottom:10px; right:15px; background:rgba(30,41,59,0.85); padding:6px 12px;
+  border-radius:10px; color:#f0f0f0; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; }
+
+#title-ribbon { height:40px; background: linear-gradient(to right,#0f2b42,#1a3c54); text-align:center; line-height:40px; font-weight:600; color:#e0e0e0;}
+#nav-ribbon { height:50px; background:#1a3c54; display:flex; justify-content:space-between; align-items:center; padding:0 15px; }
+.nav-item { cursor:pointer; padding:0 15px; line-height:50px; font-weight:500; transition: all 0.2s; color:#e0e0e0; }
+.nav-item:hover { background:rgba(255,255,255,0.1); border-radius:6px; }
+.nav-item.active { border-bottom:3px solid #6EC1E4; }
+
+.legend { position:absolute; bottom:10px; left:10px; background:rgba(30,41,59,0.9); color:#fff;
+  padding:10px; border-radius:8px; font-size:0.8rem; box-shadow:0 4px 10px rgba(0,0,0,0.3); z-index:500; }
+.legend div { display:flex; align-items:center; margin-bottom:4px; }
+.legend span { display:inline-block; width:16px; height:16px; margin-right:6px; border-radius:4px; }
+
+#hover-aqi { position:absolute; pointer-events:none; padding:6px 10px; background:rgba(30,41,59,0.9);
+  color:#fff; border-radius:8px; font-size:0.85rem; z-index:600; display:none; }
+
+.dc-icon i { pointer-events:none; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div id="header-wrapper">
+  <div id="title-ribbon">Environmental Impact of Data Centers</div>
+  <div id="nav-ribbon">
+    <div class="flex gap-3">
+      <div class="nav-item active" data-layer="air">Air Quality</div>
+      <div class="nav-item" data-layer="water">Water</div>
+      <div class="nav-item" data-layer="power">Power</div>
+      <div class="nav-item" data-layer="co2">CO2</div>
+    </div>
+  </div>
+</div>
+
+<!-- DC Info Tab -->
+<div id="dc-info-tab">
+  <button id="close-dc-tab">✖</button>
+  <div><span class="dc-icon-small"><i class="fas fa-database" style="color:cyan;"></i></span><strong id="dc-name">DC Name</strong></div>
+  <div><span class="dc-icon-small"><i class="fas fa-layer-group" style="color:#6EC1E4;"></i></span><strong>SizeRank:</strong> <span id="dc-size">N/A</span></div>
+  <div><span class="dc-icon-small"><i class="fas fa-bolt" style="color:#FACC15;"></i></span><strong>Power Source:</strong> <span id="dc-power">N/A</span></div>
+  <div><span class="dc-icon-small"><i class="fas fa-snowflake" style="color:#3B82F6;"></i></span><strong>Cooling Source:</strong> <span id="dc-cooling">N/A</span></div>
+</div>
+
+<!-- Monitor Panel -->
+<div id="monitor-panel">
+  <strong>Monitor Layer</strong>
+  <label class="cursor-pointer label">
+    <input type="radio" name="monitor-layer" checked class="radio radio-sm mr-2"> Ozone and PM
+  </label>
+  <label class="cursor-pointer label">
+    <input type="radio" name="monitor-layer" class="radio radio-sm mr-2"> Ozone only
+  </label>
+  <label class="cursor-pointer label">
+    <input type="radio" name="monitor-layer" class="radio radio-sm mr-2"> PM2.5 only
+  </label>
+</div>
+
+<!-- More Insights panel (Water) -->
+<div id="more-insights">
+  <strong>More Insights</strong>
+  <div class="insight-item" data-type="fuel">
+    <i class="fas fa-gas-pump" style="color:yellow;"></i> Fuel Type
+  </div>
+</div>
+
+<!-- Central Graph Panel -->
+<div id="insight-graph-panel">
+  <button id="close-graph-panel">✖</button>
+  <div id="graph-title" style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Fuel Type Analysis</div>
+  <div id="graph-placeholder">Graph Placeholder</div>
+</div>
+
+<div id="map"></div>
+<div id="footer-timestamp">Loading data...</div>
+<div id="hover-aqi"></div>
+<div class="legend" id="legend"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+<script>
+const map = L.map('map').setView([39.5, -98.35], 5.5); // Start zoomed on continental US
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:19
+}).addTo(map);
+
+let currentPollutant = "all";
+let monitorData = [];
+let waterData = [];
+let dcMarkers = [];
+let heatLayer = null;
+let currentLayer = "air";
+let initialLoad = true; // flag for first load
+
+// --- Legends ---
+function setLegend(layer){
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  if(layer==='air'){
+    legend.innerHTML = `
+      <div><span style="background:green"></span>Good</div>
+      <div><span style="background:yellow"></span>Moderate</div>
+      <div><span style="background:orange"></span>Unhealthy for Sensitive</div>
+      <div><span style="background:red"></span>Unhealthy</div>
+      <div><span style="background:purple"></span>Very Unhealthy</div>
+      <div><span style="background:cyan"></span>Data Center</div>
+    `;
+  } else if(layer==='water'){
+    legend.innerHTML = `
+      <div><span style="background:blue"></span>Low footprint</div>
+      <div><span style="background:cyan"></span>Moderate</div>
+      <div><span style="background:lime"></span>High</div>
+      <div><span style="background:yellow"></span>Very High</div>
+      <div><span style="background:red"></span>Extreme</div>
+      <div><span style="background:cyan"></span>Data Center</div>
+    `;
+  }
+}
+
+// --- Load Data Centers ---
+async function loadDataCenters(){
+  try {
+    const res = await fetch('http://127.0.0.1:3000/api/monitors');
+    const data = await res.json();
+    if(!data.data_centers || data.data_centers.length === 0) return;
+
+    dcMarkers.forEach(m => map.removeLayer(m));
+    dcMarkers = [];
+
+    data.data_centers.forEach(dc => {
+      if(!dc.lat || !dc.lon) return;
+      const size = dc.SizeRank ? Math.max(12, 28 - dc.SizeRank*2) : 16;
+      const marker = L.marker([Number(dc.lat), Number(dc.lon)], {
+        icon: L.divIcon({className:'dc-icon', html:`<i class="fas fa-database" style="color:cyan;font-size:${size}px;"></i>`})
+      }).addTo(map);
+      marker.on('mouseover', ()=> {
+        const tab = document.getElementById('dc-info-tab');
+        tab.style.display='flex';
+        document.getElementById('dc-name').innerText = dc.Name||'N/A';
+        document.getElementById('dc-size').innerText = dc.SizeRank||'N/A';
+        document.getElementById('dc-power').innerText = dc.PowerSource||'N/A';
+        document.getElementById('dc-cooling').innerText = dc.CoolingSource||'N/A';
+      });
+      dcMarkers.push(marker);
+    });
+
+    // Fit bounds only after initial load
+    if(!initialLoad && dcMarkers.length>0){
+      const group = new L.featureGroup(dcMarkers);
+      map.fitBounds(group.getBounds().pad(0.2));
+    }
+
+    initialLoad = false;
+  } catch(err){ console.error(err); }
+}
+
+// --- Load AQI Heatmap ---
+async function loadAQIHeatmap(){
+  try {
+    const res = await fetch(`http://127.0.0.1:3000/api/monitors?pollutant=${currentPollutant}`);
+    const data = await res.json();
+    monitorData = data.monitors||[];
+
+    if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; }
+
+    const points = monitorData.map(m=>[m.lat, m.lon, Math.min(m.aqi/500,0.6)]);
+    heatLayer = L.heatLayer(points,{radius:15,blur:8,maxZoom:10,gradient:{0:'green',0.3:'yellow',0.6:'orange',0.8:'red',1:'purple'}}).addTo(map);
+
+    // Add invisible circle markers for tooltips **only if Air layer active**
+    if(currentLayer==="air"){
+      monitorData.forEach(m => {
+        L.circleMarker([m.lat, m.lon], {radius:0.1, opacity:0})
+          .addTo(map)
+          .bindTooltip(`AQI: ${m.aqi}`, {direction:'top', className:'aqi-tooltip'});
+      });
+    }
+
+    document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+    setLegend('air');
+  } catch(err){ console.error(err); }
+}
+
+// --- Load Water Footprint ---
+async function loadWaterHeatmap(){
+  try {
+    const res = await fetch('http://127.0.0.1:3000/api/water');
+    const data = await res.json();
+    waterData = data.points||[];
+    if(waterData.length===0) return;
+
+    if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; }
+
+    heatLayer = L.layerGroup().addTo(map);
+    const maxFootprint = Math.max(...waterData.map(p=>parseFloat(p.water_footprint)||0));
+    const circles=[];
+
+    waterData.forEach(p=>{
+      const intensity = Math.min((parseFloat(p.water_footprint)||0)/maxFootprint,1.0);
+      const baseRadius = 4 + intensity*12;
+      let color = intensity<0.2?'#3B82F6':intensity<0.4?'#0EA5E9':intensity<0.6?'#06B6D4':intensity<0.8?'#22C55E':'#F87171';
+
+      const circle = L.circleMarker([p.lat,p.lon],{
+        radius: baseRadius,
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.5,
+        weight: 1
+      }).addTo(heatLayer);
+
+      circle.bindTooltip(`Water footprint: ${p.water_footprint.toFixed(2)} m³/MWh`, {direction:'top'});
+
+      circles.push({circle, baseRadius, intensity});
+    });
+
+    // Pulsing animation
+    let scaleUp = true;
+    setInterval(()=>{
+      circles.forEach(obj=>{
+        const delta = 1 + obj.intensity*3;
+        const newRadius = scaleUp ? obj.baseRadius + delta : obj.baseRadius;
+        obj.circle.setRadius(newRadius);
+        obj.circle.setStyle({ fillOpacity: 0.4 + 0.2*obj.intensity });
+      });
+      scaleUp = !scaleUp;
+    }, 800);
+
+    document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+    setLegend('water');
+  } catch(err){ console.error(err); }
+}
+
+// --- Initial Load ---
+loadDataCenters();
+loadAQIHeatmap();
+
+// --- Monitor layer radio ---
+document.getElementsByName("monitor-layer").forEach(radio=>{
+  radio.addEventListener('change', ()=>{
+    const label = radio.parentElement.textContent.trim();
+    currentPollutant = label.includes("Ozone only")?"ozone":label.includes("PM2.5")?"pm":"all";
+    if(currentLayer==="air") loadAQIHeatmap();
+  });
+});
+
+// --- Nav ribbon ---
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
+    const layer = item.dataset.layer;
+    currentLayer = layer;
+
+    document.getElementById('monitor-panel').style.display = (layer==="water")?"none":"flex";
+    document.getElementById('more-insights').style.display = (layer==="water")?"flex":"none";
+
+    if(layer==="water") loadWaterHeatmap();
+    else if(layer==="air") loadAQIHeatmap();
+    else if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; document.getElementById('footer-timestamp').innerText='Data layer not implemented yet'; setLegend(''); }
+  });
+});
+
+// --- More Insights click ---
+document.querySelectorAll('#more-insights .insight-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    if(currentLayer!=="water") return;
+    const panel = document.getElementById('insight-graph-panel');
+    panel.style.display='flex';
+    loadFuelTypeGraph();
+  });
+});
+
+// --- Close Graph Panel ---
+document.getElementById('close-graph-panel').addEventListener('click',()=>{
+  document.getElementById('insight-graph-panel').style.display='none';
+});
+
+// --- DC Info Tab toggle ---
+const dcTab = document.getElementById('dc-info-tab');
+dcTab.addEventListener('click',()=>{
+  if(dcTab.style.display==='none'||dcTab.style.display==='') dcTab.style.display='flex';
+  dcTab.classList.toggle('large');
+});
+document.getElementById('close-dc-tab').addEventListener('click',e=>{
+  e.stopPropagation();
+  dcTab.classList.remove('large');
+  dcTab.style.display='none';
+});
+
+// --- Fuel Type Graph ---
+async function loadFuelTypeGraph() {
+    try {
+        const res = await fetch('http://127.0.0.1:3000/api/water_fuel');
+        const data = await res.json();
+
+        const fuelMap = {};
+        data.forEach(row => {
+            const fuel = row.primary_fuel || 'Unknown';
+            const water = parseFloat(row.water_footprint) || 0;
+            if (!fuelMap[fuel]) fuelMap[fuel] = 0;
+            fuelMap[fuel] += water;
+        });
+
+        const labels = Object.keys(fuelMap);
+        const values = Object.values(fuelMap);
+
+        const placeholder = document.getElementById('graph-placeholder');
+        placeholder.innerHTML = '<canvas id="fuel-chart"></canvas>';
+
+        const ctx = document.getElementById('fuel-chart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Water Footprint (m³)',
+                    data: values,
+                    backgroundColor: ['#3B82F6', '#0EA5E9', '#06B6D4', '#22C55E', '#F87171', '#EAB308'],
+                    borderColor: '#fff',
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    hoverBackgroundColor: ['#60A5FA', '#38BDF8', '#22D3EE', '#4ADE80', '#FB7185', '#FACC15'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#111827',
+                        titleColor: '#6EC1E4',
+                        bodyColor: '#fff',
+                        titleFont: { weight: '600' },
+                    }
+                },
+                scales: {
+                        y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: {
+                            color: '#fff',
+                            callback: function(value) {
+                                if (value >= 1e6) return (value / 1e6).toFixed(1) + 'M';
+                                if (value >= 1e3) return (value / 1e3).toFixed(1) + 'K';
+                                return value;
+                            }
+                        },
+                        title: { display: true, text: 'Water Footprint (m³)', color:'#fff', font:{weight:'600'} }
+                    }
+
+                },
+                layout: {
+                    padding: { top: 10, bottom: 10, left: 5, right: 5 }
+                }
+            }
+        });
+    } catch (err) { console.error('Error loading fuel type graph', err); }
+}
+</script>
+</body>
+</html>
