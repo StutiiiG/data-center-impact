@@ -622,7 +622,7 @@ async function loadPowerHeatmap() {
       gradient: {0.0:'#ffff00', 0.5:'#ff8800', 1.0:'#ff0000'}
     }).addTo(map);
 
-    // Pulsating markers
+    // Add power markers (static)
     powerMarkers = [];
     powerData.forEach(p => {
       const intensity = Math.min((parseFloat(p.total_mwh)||0) / maxPower, 1);
@@ -644,7 +644,8 @@ async function loadPowerHeatmap() {
       powerMarkers.push({marker, baseRadius, intensity});
     });
 
-    // Pulsing animation
+    // --- Pulsing animation removed ---
+    /*
     if(powerPulseInterval) clearInterval(powerPulseInterval);
     let scaleUp = true;
     powerPulseInterval = setInterval(() => {
@@ -657,6 +658,7 @@ async function loadPowerHeatmap() {
       });
       scaleUp = !scaleUp;
     }, 700);
+    */
 
     document.getElementById('footer-timestamp').innerText =
       `Updated: ${new Date(data.timestamp).toLocaleString()}`;
@@ -666,6 +668,7 @@ async function loadPowerHeatmap() {
     console.error('Error loading power heatmap:', err);
   }
 }
+
 
 
 async function loadCarbonHeatmap() {
@@ -697,7 +700,7 @@ async function loadCarbonHeatmap() {
       gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
     }).addTo(map);
 
-    // Add pulsating carbon markers
+    // Add carbon markers (static)
     const pulseMarkers = [];
     carbonData.forEach(p => {
       const raw = parseFloat(p.carbon_footprint) || 0;
@@ -718,19 +721,20 @@ async function loadCarbonHeatmap() {
       pulseMarkers.push({ marker, baseRadius: 5, intensity: normalized });
     });
 
-    // Pulsing animation
-        let scaleUp = true;
-        setInterval(() => {
-          pulseMarkers.forEach(obj => {
-            const delta = 2 + obj.intensity*2; // reduce growth
-            const maxRadius = obj.baseRadius + 3; // maximum allowed radius
-            const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
-            obj.marker.setRadius(newRadius);
-            obj.marker.setStyle({ fillOpacity: 0.5 + 0.3*obj.intensity }); // slightly less aggressive
-          });
-          scaleUp = !scaleUp;
-        }, 700);
-
+    // --- Pulsing animation removed ---
+    /*
+    let scaleUp = true;
+    setInterval(() => {
+      pulseMarkers.forEach(obj => {
+        const delta = 2 + obj.intensity*2;
+        const maxRadius = obj.baseRadius + 3;
+        const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
+        obj.marker.setRadius(newRadius);
+        obj.marker.setStyle({ fillOpacity: 0.5 + 0.3*obj.intensity });
+      });
+      scaleUp = !scaleUp;
+    }, 700);
+    */
 
     document.getElementById('footer-timestamp').innerText =
       `Updated: ${new Date(data.timestamp).toLocaleString()}`;
@@ -739,6 +743,7 @@ async function loadCarbonHeatmap() {
 
   } catch(err) { console.error(err); }
 }
+
 
 
 
