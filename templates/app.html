@@ -276,7 +276,7 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 </div>
 
 <!-- Directions Button -->
-<div id="directions-btn" 
+<div id="directions-btn"
      style="
        position: fixed;
        bottom: 20px;
@@ -334,32 +334,20 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   const btn = document.getElementById('directions-btn');
   const box = document.getElementById('map-info-box');
 
-  cconst layerInfo = {
-  AirQuality: `
-    <div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
-    <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
-    <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
-    <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>
-  `,
-  Water: `
-    <div><strong>Map Overview:</strong> The map displays water usage across locations and data centers.</div>
-    <div><strong>Water Layer:</strong> Hover over the map to see water footprint for each location. Data is available for total water use, blue water, and grey water.</div>
-    <div><strong>Data Center Layer:</strong> Hover over a data center to view water usage details along with other metadata like city, state, size, and status.</div>
-    <div><strong>Interactions:</strong> Click a monitor or data center to explore more details and compare water usage across sites.</div>
-  `,
-  CO2: `
-    <div><strong>Map Overview:</strong> The map displays CO₂ emissions across locations and data centers.</div>
-    <div><strong>CO₂ Layer:</strong> Hover over the map to see emissions for each location. Emissions can be viewed per energy source or total carbon footprint.</div>
-    <div><strong>Data Center Layer:</strong> Hover over a data center to view carbon metrics, operator, city, state, project cost, and status.</div>
-    <div><strong>Interactions:</strong> Click a monitor or data center to explore CO₂ details and compare emissions between sites.</div>
-  `,
-  Power: `
-    <div><strong>Map Overview:</strong> The map displays power consumption across locations and data centers.</div>
-    <div><strong>Power Layer:</strong> Hover over the map to see electricity usage or energy sourcing for each location. Data includes type of power (renewable vs. non-renewable) and total consumption.</div>
-    <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, operator, power source, cooling source, city, state, project cost, and size.</div>
-    <div><strong>Interactions:</strong> Click a monitor or data center to explore power-related details and compare energy usage across sites.</div>
-  `
-};
+  const layerInfo = {
+    AirQuality: `<div><strong>Map Overview:</strong> The map displays current AQI across locations and data center sites.</div>
+                 <div><strong>Air Quality (AQI) Layer:</strong> Hover over the map to see the AQI at specific locations. AQI can be viewed for Ozone, PM2.5, PM10, or “Ozone and PM” (the highest NowCast AQI among the three).</div>
+                 <div><strong>Data Center Layer:</strong> Hover over a data center to view details such as name, size rank, power source, cooling source, operator, city, state, project cost, and status.</div>
+                 <div><strong>Interactions:</strong> Click a monitor or data center to explore more detailed info. Use the layer options to switch AQI view by pollutant.</div>`,
+    Water: `<div><strong>Map Overview:</strong> The map displays water usage across locations and data centers.</div>
+            <div><strong>Water Layer:</strong> Hover over the map to see water footprint for each location. Data is available for total water use, blue water, and grey water.</div>
+            <div><strong>Data Center Layer:</strong> Hover over a data center to view water usage details along with other metadata like city, state, size, and status.</div>
+            <div><strong>Interactions:</strong> Click a monitor or data center to explore more details and compare water usage across sites.</div>`,
+    CO2: `<div><strong>Map Overview:</strong> The map displays CO₂ emissions across locations and data centers.</div>
+          <div><strong>CO₂ Layer:</strong> Hover over the map to see emissions for each location. Emissions can be viewed per energy source or total carbon footprint.</div>
+          <div><strong>Data Center Layer:</strong> Hover over a data center to view carbon metrics, operator, city, state, project cost, and status.</div>
+          <div><strong>Interactions:</strong> Click a monitor or data center to explore CO₂ details and compare emissions between sites.</div>`
+  };
 
   function updateInfoBox(layer) {
     box.innerHTML = layerInfo[layer] || '<div>No info available for this layer.</div>';
