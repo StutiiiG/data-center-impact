@@ -371,9 +371,10 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   <canvas id="waterProjectionChart" width="560" height="300"></canvas>
 </div>
 
+<!-- State Filter -->
 <select id="state-filter" style="
     position: absolute;
-    top: 50%;
+    top: 35%;
     right: 20px;
     z-index: 550;
     background: rgba(30,41,59,0.95);
@@ -382,11 +383,41 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
     padding: 6px 10px;
     border: none;
     font-size: 0.9rem;
-    transform: translateY(-50%);
 ">
   <option value="all">All States</option>
-  <option value="ME">Maine</option>
-  <option value="NH">New Hampshire</option>
+</select>
+
+<!-- Fuel Filter -->
+<select id="fuel-filter" style="
+    position: absolute;
+    top: 45%;
+    right: 20px;
+    z-index: 550;
+    background: rgba(30,41,59,0.95);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 0.9rem;
+">
+  <option value="all">All Fuels</option>
+</select>
+
+<select id="subbasin-filter" style="
+    position: absolute;
+    top: 55%;
+    right: 20px;
+    z-index: 550;
+    background: rgba(30,41,59,0.95);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 0.9rem;
+    width: 150px;
+    max-width: 150px;
+">
+  <option value="all">All Subbasins</option>
 </select>
 
 
@@ -554,112 +585,313 @@ async function loadAQIHeatmap(){
 
 
 
-async function loadWaterHeatmap() {
+async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
   try {
     const res = await fetch('https://data-center-map-nu1d.onrender.com/api/water');
     const data = await res.json();
-    waterData = data.points || [];
-    if (waterData.length === 0) return;
+    let waterData = data.points || [];
+    if (!waterData.length) return;
 
-    // Remove old heat & markers first
+    // --- Apply State Filter for dropdown population ---
+    let filteredForDropdowns = waterData;
+    if (selectedState !== "all") {
+      filteredForDropdowns = filteredForDropdowns.filter(p => p.state === selectedState);
+    }
+
+    // ======================================================
+    //                STATE DROPDOWN
+    // ======================================================
+    const stateSelect = document.getElementById('state-filter');
+    if (stateSelect) {
+      const allStates = [...new Set(waterData.map(p => p.state).filter(Boolean))].sort();
+      stateSelect.innerHTML = '';
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All States';
+      allOption.selected = selectedState === 'all';
+      stateSelect.appendChild(allOption);
+
+      allStates.forEach(state => {
+        const option = document.createElement('option');
+        option.value = state;
+        option.text = state;
+        if (state === selectedState) option.selected = true;
+        stateSelect.appendChild(option);
+      });
+
+      // Expand on click/focus
+      stateSelect.addEventListener('focus', () => {
+        stateSelect.size = Math.min(5, stateSelect.options.length);
+      });
+
+      // Collapse when done
+      stateSelect.addEventListener('blur', () => {
+        stateSelect.size = 1;
+      });
+
+      stateSelect.size = 1;
+    }
+
+    // ======================================================
+    //                FUEL DROPDOWN
+    // ======================================================
+    const fuelSelect = document.getElementById('fuel-filter');
+    if (fuelSelect) {
+      const allFuels = [...new Set(filteredForDropdowns.map(p => p.fuel).filter(Boolean))].sort();
+      fuelSelect.innerHTML = '';
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All Fuels';
+      allOption.selected = selectedFuel === 'all';
+      fuelSelect.appendChild(allOption);
+
+      allFuels.forEach(fuel => {
+        const option = document.createElement('option');
+        option.value = fuel;
+        option.text = fuel;
+        if (fuel === selectedFuel) option.selected = true;
+        fuelSelect.appendChild(option);
+      });
+
+      fuelSelect.addEventListener('focus', () => {
+        fuelSelect.size = Math.min(5, fuelSelect.options.length);
+      });
+
+      fuelSelect.addEventListener('blur', () => {
+        fuelSelect.size = 1;
+      });
+
+      fuelSelect.size = 1;
+    }
+
+    // ======================================================
+    //             SUBBASIN DROPDOWN
+    // ======================================================
+    let filteredForSubbasin = filteredForDropdowns;
+    if (selectedFuel !== "all") {
+      filteredForSubbasin = filteredForSubbasin.filter(p => p.fuel === selectedFuel);
+    }
+
+    const subbasinSelect = document.getElementById('subbasin-filter');
+    if (subbasinSelect) {
+      const allSubbasins = [...new Set(filteredForSubbasin.map(p => p.subbasin).filter(Boolean))].sort();
+      subbasinSelect.innerHTML = '';
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All Subbasins';
+      allOption.selected = selectedSubbasin === 'all';
+      subbasinSelect.appendChild(allOption);
+
+      allSubbasins.forEach(sb => {
+        const option = document.createElement('option');
+        option.value = sb;
+        option.text = sb;
+        if (sb === selectedSubbasin) option.selected = true;
+        subbasinSelect.appendChild(option);
+      });
+
+      subbasinSelect.addEventListener('focus', () => {
+        subbasinSelect.size = Math.min(5, subbasinSelect.options.length);
+      });
+
+      subbasinSelect.addEventListener('blur', () => {
+        subbasinSelect.size = 1;
+      });
+
+      subbasinSelect.size = 1;
+    }
+
+    // ======================================================
+    //       APPLY FINAL FILTERS FOR PLOTTING
+    // ======================================================
+    if (selectedState !== "all") waterData = waterData.filter(p => p.state === selectedState);
+    if (selectedFuel !== "all") waterData = waterData.filter(p => p.fuel === selectedFuel);
+    if (selectedSubbasin !== "all") waterData = waterData.filter(p => p.subbasin === selectedSubbasin);
+
+    // --- Clear old markers and draw new ones ---
     clearWaterLayer();
-
     const maxFootprint = Math.max(...waterData.map(p => parseFloat(p.water_footprint) || 0));
+    waterMarkers = [];
 
-    // --- HeatLayer commented out ---
-    /*
-    const heatPoints = waterData.map(p => [p.lat, p.lon, (parseFloat(p.water_footprint)||0) / maxFootprint * 0.02]);
-    waterHeatLayer = L.heatLayer(heatPoints, {
-      radius: 15,
-      blur: 15,
-      minOpacity: 0.2,
-      gradient: {
-        0.0: '#0000ff',
-        0.25: '#00ffff',
-        0.5: '#00ff00',
-        0.75: '#ffff00',
-        1.0: '#ff0000'
-      }
-    }).addTo(map);
-    */
-
-    // --- Pulsating Circles (static now) ---
-    waterMarkers = []; // reset
     waterData.forEach(p => {
-      const intensity = Math.min((parseFloat(p.water_footprint) || 0) / maxFootprint, 1.0);
+      const footprint = parseFloat(p.water_footprint) || 0;
+      const intensity = Math.min(footprint / maxFootprint, 1.0);
       const baseRadius = 4 + intensity * 12;
-      let color = intensity < 0.2 ? '#3B82F6' :
-                  intensity < 0.4 ? '#0EA5E9' :
-                  intensity < 0.6 ? '#06B6D4' :
-                  intensity < 0.8 ? '#22C55E' :
-                  '#F87171';
+
+      const color = intensity < 0.2 ? '#3B82F6' :
+                    intensity < 0.4 ? '#0EA5E9' :
+                    intensity < 0.6 ? '#06B6D4' :
+                    intensity < 0.8 ? '#22C55E' :
+                    '#F87171';
 
       const circle = L.circleMarker([p.lat, p.lon], {
         radius: baseRadius,
-        color: color,
+        color,
         fillColor: color,
         fillOpacity: 0.5,
         weight: 1,
         pane: 'markerPane'
       }).addTo(map);
 
-      circle.bindTooltip(`Water footprint: ${p.water_footprint.toFixed(2)} m³/MWh`, {direction:'top'});
-      waterMarkers.push({circle, baseRadius, intensity});
+      circle.bindTooltip(`Water footprint: ${footprint.toFixed(2)} m³/MWh`, { direction: 'top' });
+      waterMarkers.push({ circle, baseRadius, intensity });
     });
 
-    // --- Pulsing animation removed ---
-    /*
-    if (waterPulseInterval) clearInterval(waterPulseInterval);
-    let scaleUp = true;
-    waterPulseInterval = setInterval(() => {
-      waterMarkers.forEach(obj => {
-        const delta = 1 + obj.intensity * 3;
-        const maxRadius = obj.baseRadius + 4;
-        const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
-        obj.circle.setRadius(newRadius);
-        obj.circle.setStyle({ fillOpacity: 0.4 + 0.2 * obj.intensity });
-      });
-      scaleUp = !scaleUp;
-    }, 800);
-    */
+    // --- Update timestamp ---
+    const footer = document.getElementById('footer-timestamp');
+    if (footer && data.timestamp) {
+      footer.innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+    }
 
-    document.getElementById('footer-timestamp').innerText =
-      `Updated: ${new Date(data.timestamp).toLocaleString()}`;
     setLegend('water');
 
-  } catch(err) {
+  } catch (err) {
     console.error('Error loading water heatmap:', err);
   }
 }
 
 
-async function loadPowerHeatmap() {
-  try {
-    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/power');
-    const data = await res.json();
-    const powerData = data.points || [];
-    if (powerData.length === 0) return;
 
-    // Clear previous power layer
+
+async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
+  try {
+    const res = await fetch('http://127.0.0.1:3000/api/power');
+    const data = await res.json();
+    let powerData = data.points || [];
+    if (!powerData.length) return;
+
+    // --- Filter data for dropdown population ---
+    let filteredForDropdowns = powerData;
+    if (selectedState !== "all") {
+      filteredForDropdowns = filteredForDropdowns.filter(p => p.state === selectedState);
+    }
+
+    // ==========================
+    //   STATE DROPDOWN
+    // ==========================
+    const stateSelect = document.getElementById('state-filter');
+    if (stateSelect) {
+      const allStates = [...new Set(powerData.map(p => p.state).filter(Boolean))].sort();
+      stateSelect.innerHTML = '';
+      stateSelect.size = 5; // show 5 at a time
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All States';
+      allOption.selected = selectedState === 'all';
+      stateSelect.appendChild(allOption);
+
+      allStates.forEach(state => {
+        const option = document.createElement('option');
+        option.value = state;
+        option.text = state;
+        if (state === selectedState) option.selected = true;
+        stateSelect.appendChild(option);
+      });
+
+      // Collapse on blur
+      stateSelect.addEventListener('blur', () => { stateSelect.size = 1; });
+    }
+
+    // ==========================
+    //   FUEL DROPDOWN
+    // ==========================
+    const fuelSelect = document.getElementById('fuel-filter');
+    if (fuelSelect) {
+      const allFuels = [...new Set(filteredForDropdowns.map(p => p.primary_fuel).filter(Boolean))].sort();
+      fuelSelect.innerHTML = '';
+      fuelSelect.size = 5;
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All Fuels';
+      allOption.selected = selectedFuel === 'all';
+      fuelSelect.appendChild(allOption);
+
+      allFuels.forEach(fuel => {
+        const option = document.createElement('option');
+        option.value = fuel;
+        option.text = fuel;
+        if (fuel === selectedFuel) option.selected = true;
+        fuelSelect.appendChild(option);
+      });
+
+      fuelSelect.addEventListener('blur', () => { fuelSelect.size = 1; });
+    }
+
+    // ==========================
+    //   SUBBASIN DROPDOWN
+    // ==========================
+    let filteredForSubbasin = filteredForDropdowns;
+    if (selectedFuel !== "all") {
+      filteredForSubbasin = filteredForSubbasin.filter(p => p.primary_fuel === selectedFuel);
+    }
+
+    const subbasinSelect = document.getElementById('subbasin-filter');
+    if (subbasinSelect) {
+      const allSubbasins = [...new Set(filteredForSubbasin.map(p => p.subbasin).filter(Boolean))].sort();
+      subbasinSelect.innerHTML = '';
+      subbasinSelect.size = 5;
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All Subbasins';
+      allOption.selected = selectedSubbasin === 'all';
+      subbasinSelect.appendChild(allOption);
+
+      allSubbasins.forEach(sb => {
+        const option = document.createElement('option');
+        option.value = sb;
+        option.text = sb;
+        if (sb === selectedSubbasin) option.selected = true;
+        subbasinSelect.appendChild(option);
+      });
+
+      subbasinSelect.addEventListener('blur', () => { subbasinSelect.size = 1; });
+    }
+
+    // ==========================
+    //   Apply Final Filters
+    // ==========================
+    if (selectedState !== "all") powerData = powerData.filter(p => p.state === selectedState);
+    if (selectedFuel !== "all") powerData = powerData.filter(p => p.primary_fuel === selectedFuel);
+    if (selectedSubbasin !== "all") powerData = powerData.filter(p => p.subbasin === selectedSubbasin);
+
+    // ==========================
+    //   Collapse All
+    // ==========================
+    [stateSelect, fuelSelect, subbasinSelect].forEach(sel => sel && sel.removeAttribute('size'));
+
+    if (!powerData.length) return;
+
+    // ==========================
+    //   Clear Previous Layer
+    // ==========================
     clearPowerLayer();
 
     const maxPower = Math.max(...powerData.map(p => parseFloat(p.total_mwh) || 1));
 
-    // --- HeatLayer commented out ---
-    /*
-    const heatPoints = powerData.map(p => [p.lat, p.lon, (parseFloat(p.total_mwh) || 0) / maxPower * 0.02]);
+    // HeatLayer
+    const heatPoints = powerData.map(p => [
+      p.lat,
+      p.lon,
+      (parseFloat(p.total_mwh) || 0) / maxPower * 0.02
+    ]);
+
     powerHeatLayer = L.heatLayer(heatPoints, {
       radius: 15,
       blur: 15,
       minOpacity: 0.2,
       gradient: {0.0:'#ffff00', 0.5:'#ff8800', 1.0:'#ff0000'}
     }).addTo(map);
-    */
 
-    // Add power markers (static)
+    // Pulsating markers
     powerMarkers = [];
     powerData.forEach(p => {
-      const intensity = Math.min((parseFloat(p.total_mwh)||0) / maxPower, 1);
+      const intensity = Math.min((parseFloat(p.total_mwh)||0)/maxPower, 1);
       const baseRadius = 4 + intensity * 10;
 
       const marker = L.circleMarker([p.lat, p.lon], {
@@ -672,32 +904,17 @@ async function loadPowerHeatmap() {
 
       marker.bindTooltip(
         `Power: ${p.total_mwh.toLocaleString()} MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
-        {direction:'top', className:'aqi-tooltip'}
+        { direction:'top', className:'aqi-tooltip' }
       );
 
-      powerMarkers.push({marker, baseRadius, intensity});
+      powerMarkers.push({ marker, baseRadius, intensity });
     });
-
-    // --- Pulsing animation removed ---
-    /*
-    if(powerPulseInterval) clearInterval(powerPulseInterval);
-    let scaleUp = true;
-    powerPulseInterval = setInterval(() => {
-      powerMarkers.forEach(obj => {
-        const delta = 1 + obj.intensity * 3;
-        const maxRadius = obj.baseRadius + 4;
-        const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
-        obj.marker.setRadius(newRadius);
-        obj.marker.setStyle({ fillOpacity: 0.4 + 0.3 * obj.intensity });
-      });
-      scaleUp = !scaleUp;
-    }, 700);
-    */
 
     document.getElementById('footer-timestamp').innerText =
       `Updated: ${new Date(data.timestamp).toLocaleString()}`;
 
     setLegend('power');
+
   } catch(err) {
     console.error('Error loading power heatmap:', err);
   }
@@ -705,39 +922,122 @@ async function loadPowerHeatmap() {
 
 
 
-async function loadCarbonHeatmap() {
-  try {
-    const res = await fetch('https://data-center-map-nu1d.onrender.com/api/carbon');
-    const data = await res.json();
-    const carbonData = data.points || [];
-    if (carbonData.length === 0) return;
 
-    // Remove previous heatLayer & markers
-    if (heatLayer) { 
-      map.removeLayer(heatLayer); 
-      heatLayer = null; 
+
+async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", selectedSubbasin = "all") {
+  try {
+    const res = await fetch('http://127.0.0.1:3000/api/carbon');
+    const data = await res.json();
+    let carbonData = data.points || [];
+    if (!carbonData.length) return;
+
+    // --- Filtered data for dropdown population ---
+    let filteredForDropdowns = carbonData;
+    if (selectedState !== "all") filteredForDropdowns = filteredForDropdowns.filter(p => p.state === selectedState);
+
+    // --- Populate State Dropdown ---
+    const stateSelect = document.getElementById('state-filter');
+    if (stateSelect) {
+      const allStates = [...new Set(carbonData.map(p => p.state).filter(Boolean))].sort();
+      stateSelect.innerHTML = '';
+      stateSelect.size = 6;
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All States';
+      allOption.selected = selectedState === 'all';
+      stateSelect.appendChild(allOption);
+
+      allStates.forEach(state => {
+        const option = document.createElement('option');
+        option.value = state;
+        option.text = state;
+        if (state === selectedState) option.selected = true;
+        stateSelect.appendChild(option);
+      });
     }
+
+    // --- Populate Fuel Dropdown based on selected state ---
+    const fuelSelect = document.getElementById('fuel-filter');
+    if (fuelSelect) {
+      const allFuels = [...new Set(filteredForDropdowns.map(p => p.primary_fuel).filter(Boolean))].sort();
+      fuelSelect.innerHTML = '';
+      fuelSelect.size = 6;
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All Fuels';
+      allOption.selected = selectedFuel === 'all';
+      fuelSelect.appendChild(allOption);
+
+      allFuels.forEach(fuel => {
+        const option = document.createElement('option');
+        option.value = fuel;
+        option.text = fuel;
+        if (fuel === selectedFuel) option.selected = true;
+        fuelSelect.appendChild(option);
+      });
+    }
+
+    // --- Populate Subbasin Dropdown based on selected state + fuel ---
+    let filteredForSubbasin = filteredForDropdowns;
+    if (selectedFuel !== "all") filteredForSubbasin = filteredForSubbasin.filter(p => p.primary_fuel === selectedFuel);
+
+    const subbasinSelect = document.getElementById('subbasin-filter');
+    if (subbasinSelect) {
+      const allSubbasins = [...new Set(filteredForSubbasin.map(p => p.subbasin).filter(Boolean))].sort();
+      subbasinSelect.innerHTML = '';
+      subbasinSelect.size = 6;
+
+      const allOption = document.createElement('option');
+      allOption.value = 'all';
+      allOption.text = 'All Subbasins';
+      allOption.selected = selectedSubbasin === 'all';
+      subbasinSelect.appendChild(allOption);
+
+      allSubbasins.forEach(sb => {
+        const option = document.createElement('option');
+        option.value = sb;
+        option.text = sb;
+        if (sb === selectedSubbasin) option.selected = true;
+        subbasinSelect.appendChild(option);
+      });
+    }
+
+    // --- Apply final filters for plotting ---
+    if (selectedState !== "all") carbonData = carbonData.filter(p => p.state === selectedState);
+    if (selectedFuel !== "all") carbonData = carbonData.filter(p => p.primary_fuel === selectedFuel);
+    if (selectedSubbasin !== "all") carbonData = carbonData.filter(p => p.subbasin === selectedSubbasin);
+
+    // --- Collapse dropdowns ---
+    [stateSelect, fuelSelect, subbasinSelect].forEach(sel => sel && sel.removeAttribute('size'));
+
+    if (!carbonData.length) return;
+
+    // --- Clear previous heat & markers ---
+    if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
     carbonMarkers.forEach(m => map.removeLayer(m));
     carbonMarkers = [];
 
     const maxCarbon = Math.max(...carbonData.map(p => parseFloat(p.carbon_footprint) || 1));
 
-    // --- HeatLayer removed ---
-    // const heatPoints = carbonData.map(p => {
-    //   const raw = parseFloat(p.carbon_footprint) || 0;
-    //   let normalized = (raw / maxCarbon) * 100;
-    //   normalized = Math.min(normalized, 1);
-    //   return [p.lat, p.lon, normalized];
-    // });
-    // heatLayer = L.heatLayer(heatPoints, {...}).addTo(map);
+    const heatPoints = carbonData.map(p => {
+      const raw = parseFloat(p.carbon_footprint) || 0;
+      let normalized = Math.min((raw / maxCarbon) * 100, 1);
+      return [p.lat, p.lon, normalized];
+    });
 
-    // Add carbon markers (static)
+    heatLayer = L.heatLayer(heatPoints, {
+      radius: 25,
+      blur: 30,
+      maxZoom: 10,
+      gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
+    }).addTo(map);
+
     carbonData.forEach(p => {
       const raw = parseFloat(p.carbon_footprint) || 0;
-      let normalized = (raw / maxCarbon) * 100;
-      normalized = Math.min(normalized, 1);
+      let normalized = Math.min((raw / maxCarbon) * 100, 1);
       const colorIntensity = `rgba(255,0,0,${0.6 + 0.4*normalized})`;
-
       const marker = L.circleMarker([p.lat, p.lon], {
         radius: 5,
         fillColor: colorIntensity,
@@ -745,35 +1045,49 @@ async function loadCarbonHeatmap() {
         fillOpacity: 0.8,
         weight: 0.5
       }).addTo(map)
-        .bindTooltip(`CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh`, {direction:'top', className:'aqi-tooltip'});
-
+        .bindTooltip(`CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`, {direction:'top', className:'aqi-tooltip'});
       carbonMarkers.push(marker);
     });
 
-    // --- Pulsing animation removed ---
-    /*
-    let scaleUp = true;
-    setInterval(() => {
-      pulseMarkers.forEach(obj => {
-        const delta = 2 + obj.intensity*2;
-        const maxRadius = obj.baseRadius + 3;
-        const newRadius = scaleUp ? Math.min(obj.baseRadius + delta, maxRadius) : obj.baseRadius;
-        obj.marker.setRadius(newRadius);
-        obj.marker.setStyle({ fillOpacity: 0.5 + 0.3*obj.intensity });
-      });
-      scaleUp = !scaleUp;
-    }, 700);
-    */
-
-    document.getElementById('footer-timestamp').innerText =
-      `Updated: ${new Date(data.timestamp).toLocaleString()}`;
-
+    document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
     setLegend('co2');
 
-  } catch(err) { 
-    console.error(err); 
+  } catch(err) {
+    console.error('Error loading carbon heatmap:', err);
   }
 }
+
+
+// Track currently active layer
+let activeLayer = 'water'; // default
+
+// Helper to get current selected values from all dropdowns
+function getFilterValues() {
+  const stateSelect = document.getElementById('state-filter');
+  const fuelSelect = document.getElementById('fuel-filter');
+  const subbasinSelect = document.getElementById('subbasin-filter');
+
+  return {
+    state: stateSelect ? stateSelect.value : 'all',
+    fuel: fuelSelect ? fuelSelect.value : 'all',
+    subbasin: subbasinSelect ? subbasinSelect.value : 'all'
+  };
+}
+
+// --- Event listeners for all filters ---
+['state-filter', 'fuel-filter', 'subbasin-filter'].forEach(id => {
+  const select = document.getElementById(id);
+  if (select) {
+    select.addEventListener('change', async () => {
+      const { state, fuel, subbasin } = getFilterValues();
+
+      // When state changes, reload heatmap and repopulate dependent dropdowns
+      if (currentLayer === 'water') await loadWaterHeatmap(state, fuel, subbasin);
+      else if (currentLayer === 'power') await loadPowerHeatmap(state, fuel, subbasin);
+      else if (currentLayer === 'co2') await loadCarbonHeatmap(state, fuel, subbasin);
+    });
+  }
+});
 
 
 
