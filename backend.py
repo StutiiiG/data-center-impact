@@ -465,6 +465,10 @@ def water_carbon_data():
 def test():
     return "Flask is working!"
 
+@app.route("/")
+def index():
+    return render_template("app.html")
+
 # --- Main entry ---
 if __name__ == '__main__':
     print(f"Starting Flask server on http://127.0.0.1:3000...")
