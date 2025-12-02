@@ -1,2 +1,7 @@
 Flask
+flask-cors
+pytz
 pandas
+numpy
+numbers-parser
+gunicorn
