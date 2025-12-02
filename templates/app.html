@@ -615,7 +615,8 @@ async function loadPowerHeatmap() {
 
     const maxPower = Math.max(...powerData.map(p => parseFloat(p.total_mwh) || 1));
 
-    // HeatLayer for power
+    // --- HeatLayer commented out ---
+    /*
     const heatPoints = powerData.map(p => [p.lat, p.lon, (parseFloat(p.total_mwh) || 0) / maxPower * 0.02]);
     powerHeatLayer = L.heatLayer(heatPoints, {
       radius: 15,
@@ -623,6 +624,7 @@ async function loadPowerHeatmap() {
       minOpacity: 0.2,
       gradient: {0.0:'#ffff00', 0.5:'#ff8800', 1.0:'#ff0000'}
     }).addTo(map);
+    */
 
     // Add power markers (static)
     powerMarkers = [];
