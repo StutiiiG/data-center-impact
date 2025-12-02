@@ -380,9 +380,18 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
 <script>
-const map = L.map('map').setView([39.5, -98.35], 5.5); // Start zoomed on continental US
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-  attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:19
+const startZoom = 5;
+const map = L.map('map', {
+    center: [39.5, -98.35],  // center of continental US
+    zoom: startZoom,          // starting zoom
+    minZoom: startZoom,       // restrict zoom out to starting zoom
+    maxZoom: startZoom + 3    // allow zoom in only 3 steps
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19              // tile layer maxZoom
 }).addTo(map);
 
 let currentPollutant = "all";
