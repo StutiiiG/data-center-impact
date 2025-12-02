@@ -1,4 +1,4 @@
-ƒ<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -216,19 +216,22 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   color: #e0e0e0;
 }
 
+/* Navigation Ribbon */
 #nav-ribbon {
-  height: 70px;        /* taller ribbon */
-  line-height: 70px;   /* vertically center items */
+  height: 60px; /* taller */
+  line-height: 60px; /* vertically center items */
   background: #1a3c54;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
 }
+
 .nav-item {
-  padding: 0 24px;     /* just horizontal spacing, vertical auto-centered via line-height */
+  font-size: 1.1rem; /* slightly bigger nav options */
+  padding: 0 18px;
+  line-height: 60px; /* match ribbon height */
 }
-  
 .nav-item:hover { background:rgba(255,255,255,0.1); border-radius:6px; }
 .nav-item.active { border-bottom:3px solid #6EC1E4; }
 
@@ -367,6 +370,25 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   <div style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Water Projections</div>
   <canvas id="waterProjectionChart" width="560" height="300"></canvas>
 </div>
+
+<select id="state-filter" style="
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    z-index: 550;
+    background: rgba(30,41,59,0.95);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: none;
+    font-size: 0.9rem;
+    transform: translateY(-50%);
+">
+  <option value="all">All States</option>
+  <option value="ME">Maine</option>
+  <option value="NH">New Hampshire</option>
+</select>
+
 
 
 <div id="footer-timestamp">Loading data...</div>
