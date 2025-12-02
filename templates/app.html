@@ -830,12 +830,12 @@ async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", sel
       (parseFloat(p.total_mwh) || 0) / maxPower * 0.02
     ]);
 
-    powerHeatLayer = L.heatLayer(heatPoints, {
-      radius: 15,
-      blur: 15,
-      minOpacity: 0.2,
-      gradient: {0.0:'#ffff00', 0.5:'#ff8800', 1.0:'#ff0000'}
-    }).addTo(map);
+    // powerHeatLayer = L.heatLayer(heatPoints, {
+    //   radius: 15,
+    //   blur: 15,
+    //   minOpacity: 0.2,
+    //   gradient: {0.0:'#ffff00', 0.5:'#ff8800', 1.0:'#ff0000'}
+    // }).addTo(map);
 
     // Pulsating markers
     powerMarkers = [];
@@ -983,12 +983,12 @@ async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", se
       return [p.lat, p.lon, normalized];
     });
 
-    heatLayer = L.heatLayer(heatPoints, {
-      radius: 25,
-      blur: 30,
-      maxZoom: 10,
-      gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
-    }).addTo(map);
+    // heatLayer = L.heatLayer(heatPoints, {
+    //   radius: 25,
+    //   blur: 30,
+    //   maxZoom: 10,
+    //   gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
+    // }).addTo(map);
 
     filteredForPlot.forEach(p => {
       const raw = parseFloat(p.carbon_footprint) || 0;
