@@ -299,33 +299,35 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
 
 <style>
   #map-info-box {
-    position: absolute;
-    top: 80px;      /* adjust for header */
-    right: 15px;
-    width: 340px;
-    background: rgba(30, 41, 59, 0.95);
-    color: #f0f0f0;
-    padding: 18px 20px;
-    border-radius: 16px;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.6);
-    font-size: 0.92rem;
-    line-height: 1.5rem;
-    z-index: 520;
-    transition: all 0.3s ease;
-  }
+  position: absolute;
+  top: 80px;      /* adjust for header */
+  right: 15px;
+  width: 340px;
+  background: rgba(30, 41, 59, 0.85); /* slightly more transparent */
+  color: #f0f0f0;
+  padding: 18px 20px;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+  font-size: 0.92rem;
+  line-height: 1.5rem;
+  z-index: 520;
+  transition: all 0.3s ease;
+  overflow-y: auto;
+}
 
-  #map-info-box strong {
-    color: #6EC1E4;
-  }
+#map-info-box strong {
+  color: #6EC1E4;
+}
 
-  #map-info-box div {
-    margin-bottom: 10px;
-  }
+#map-info-box div {
+  margin-bottom: 10px;
+}
 
-  #map-info-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(0,0,0,0.65);
-  }
+#map-info-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.65);
+}
+
 </style>
 
 <script>
