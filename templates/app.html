@@ -638,7 +638,7 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
     // ======================================================
     const fuelSelect = document.getElementById('fuel-filter');
     if (fuelSelect) {
-      const allFuels = [...new Set(filteredForDropdowns.map(p => p.fuel).filter(Boolean))].sort();
+      const allFuels = [...new Set(filteredForDropdowns.map(p => p.primary_fuel).filter(Boolean))].sort();
       fuelSelect.innerHTML = '';
 
       const allOption = document.createElement('option');
@@ -671,7 +671,7 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
     // ======================================================
     let filteredForSubbasin = filteredForDropdowns;
     if (selectedFuel !== "all") {
-      filteredForSubbasin = filteredForSubbasin.filter(p => p.fuel === selectedFuel);
+      filteredForSubbasin = filteredForSubbasin.filter(p => p.primary_fuelƒ === selectedFuel);
     }
 
     const subbasinSelect = document.getElementById('subbasin-filter');
@@ -708,7 +708,7 @@ async function loadWaterHeatmap(selectedState = "all", selectedFuel = "all", sel
     //       APPLY FINAL FILTERS FOR PLOTTING
     // ======================================================
     if (selectedState !== "all") waterData = waterData.filter(p => p.state === selectedState);
-    if (selectedFuel !== "all") waterData = waterData.filter(p => p.fuel === selectedFuel);
+    if (selectedFuel !== "all") waterData = waterData.filter(p => p.primary_fuel === selectedFuel);
     if (selectedSubbasin !== "all") waterData = waterData.filter(p => p.subbasin === selectedSubbasin);
 
     // --- Clear old markers and draw new ones ---
