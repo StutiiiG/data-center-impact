@@ -1440,6 +1440,7 @@ async function loadFuelTypeGraph(layerType = "water") {
         const values = Object.values(fuelMap);
 
         const placeholder = document.getElementById('graph-placeholder');
+        document.getElementById('graph-title').innerText = 'Fuel Type Analysis';
         placeholder.innerHTML = '<canvas id="fuel-chart"></canvas>';
 
         const ctx = document.getElementById('fuel-chart').getContext('2d');
