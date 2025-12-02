@@ -46,7 +46,6 @@ def get_aqi_and_color_proxy(concentration_ppm):
         color = "purple"
     return max(1, aqi), color
 
-# --- Load AQI monitor data ---
 def load_monitor_data():
     global MONITOR_DATA
     MONITOR_DATA = []
@@ -55,44 +54,36 @@ def load_monitor_data():
         print(f"Monitor CSV not found: {MONITOR_CSV}")
         return
 
-    with open(MONITOR_CSV, newline='', encoding='utf-8') as f:
-        reader = csv.reader(f)
-        try:
-            header = next(reader)
-        except StopIteration:
-            print("Monitor CSV is empty.")
-            return
+    try:
+        df = pd.read_csv(MONITOR_CSV)
+        # Strip any whitespace from column names
+        df.columns = df.columns.str.strip()
+    except Exception as e:
+        print(f"Failed to read monitor CSV: {e}")
+        return
 
+    count = 0
+    for _, row in df.iterrows():
         try:
-            lat_idx = header.index('Latitude')
-            lon_idx = header.index('Longitude')
-            mean_idx = header.index('Arithmetic Mean')
-            site_name_idx = header.index('Local Site Name')
-            pollutant_idx = header.index('Parameter Name')
-        except ValueError as e:
-            print(f"Missing column in monitor CSV: {e}")
-            return
+            lat = float(row['Latitude'])
+            lon = float(row['Longitude'])
+            conc = float(row['Arithmetic Mean'])
+            city = row['Local Site Name']
+            pollutant = str(row['Parameter Name']).lower()
+            aqi, color = get_aqi_and_color_proxy(conc)
 
-        count = 0
-        for row in reader:
-            try:
-                lat = float(row[lat_idx])
-                lon = float(row[lon_idx])
-                conc = float(row[mean_idx])
-                city = row[site_name_idx]
-                pollutant = row[pollutant_idx].lower()
-                aqi, color = get_aqi_and_color_proxy(conc)
-                MONITOR_DATA.append({
-                    "lat": lat,
-                    "lon": lon,
-                    "aqi": aqi,
-                    "city": city,
-                    "color": color,
-                    "pollutant": pollutant
-                })
-                count += 1
-            except Exception:
-                continue
+            MONITOR_DATA.append({
+                "lat": lat,
+                "lon": lon,
+                "aqi": aqi,
+                "city": city,
+                "color": color,
+                "pollutant": pollutant
+            })
+            count += 1
+        except Exception as e:
+            print(f"Skipping row due to error: {e}")
+            continue
 
     print(f"Loaded {count} monitor records.")
 
