@@ -736,86 +736,87 @@ async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", sel
     let powerData = data.points || [];
     if (!powerData.length) return;
 
-    // --- Filter data for dropdown population ---
-    let filteredForDropdowns = powerData;
-    if (selectedState !== "all") {
-      filteredForDropdowns = filteredForDropdowns.filter(p => p.state === selectedState);
-    }
+    // --- Apply filters for plotting only ---
+    let filteredForPlot = powerData.slice();
+    if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
+    if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
+    if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
 
-    // ==========================
-    //   STATE DROPDOWN
-    // ==========================
+    // --- Compute allowed values for dropdowns based on other selections ---
+    const filteredStates = [...new Set(
+      powerData
+        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
+                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+        .map(p => p.state).filter(Boolean)
+    )].sort();
+
+    const filteredFuels = [...new Set(
+      powerData
+        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+        .map(p => p.primary_fuel).filter(Boolean)
+    )].sort();
+
+    const filteredSubbasins = [...new Set(
+      powerData
+        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
+        .map(p => p.subbasin).filter(Boolean)
+    )].sort();
+
+    // --- Populate STATE DROPDOWN ---
     const stateSelect = document.getElementById('state-filter');
     if (stateSelect) {
-      const allStates = [...new Set(powerData.map(p => p.state).filter(Boolean))].sort();
       stateSelect.innerHTML = '';
-      stateSelect.size = 5; // show 5 at a time
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All States';
       allOption.selected = selectedState === 'all';
       stateSelect.appendChild(allOption);
 
-      allStates.forEach(state => {
+      filteredStates.forEach(s => {
         const option = document.createElement('option');
-        option.value = state;
-        option.text = state;
-        if (state === selectedState) option.selected = true;
+        option.value = s;
+        option.text = s;
+        if (s === selectedState) option.selected = true;
         stateSelect.appendChild(option);
       });
 
-      // Collapse on blur
-      stateSelect.addEventListener('blur', () => { stateSelect.size = 1; });
+      stateSelect.size = 1;
     }
 
-    // ==========================
-    //   FUEL DROPDOWN
-    // ==========================
+    // --- Populate FUEL DROPDOWN ---
     const fuelSelect = document.getElementById('fuel-filter');
     if (fuelSelect) {
-      const allFuels = [...new Set(filteredForDropdowns.map(p => p.primary_fuel).filter(Boolean))].sort();
       fuelSelect.innerHTML = '';
-      fuelSelect.size = 5;
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All Fuels';
       allOption.selected = selectedFuel === 'all';
       fuelSelect.appendChild(allOption);
 
-      allFuels.forEach(fuel => {
+      filteredFuels.forEach(f => {
         const option = document.createElement('option');
-        option.value = fuel;
-        option.text = fuel;
-        if (fuel === selectedFuel) option.selected = true;
+        option.value = f;
+        option.text = f;
+        if (f === selectedFuel) option.selected = true;
         fuelSelect.appendChild(option);
       });
 
-      fuelSelect.addEventListener('blur', () => { fuelSelect.size = 1; });
+      fuelSelect.size = 1;
     }
 
-    // ==========================
-    //   SUBBASIN DROPDOWN
-    // ==========================
-    let filteredForSubbasin = filteredForDropdowns;
-    if (selectedFuel !== "all") {
-      filteredForSubbasin = filteredForSubbasin.filter(p => p.primary_fuel === selectedFuel);
-    }
-
+    // --- Populate SUBBASIN DROPDOWN ---
     const subbasinSelect = document.getElementById('subbasin-filter');
     if (subbasinSelect) {
-      const allSubbasins = [...new Set(filteredForSubbasin.map(p => p.subbasin).filter(Boolean))].sort();
       subbasinSelect.innerHTML = '';
-      subbasinSelect.size = 5;
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All Subbasins';
       allOption.selected = selectedSubbasin === 'all';
       subbasinSelect.appendChild(allOption);
 
-      allSubbasins.forEach(sb => {
+      filteredSubbasins.forEach(sb => {
         const option = document.createElement('option');
         option.value = sb;
         option.text = sb;
@@ -823,32 +824,15 @@ async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", sel
         subbasinSelect.appendChild(option);
       });
 
-      subbasinSelect.addEventListener('blur', () => { subbasinSelect.size = 1; });
+      subbasinSelect.size = 1;
     }
 
-    // ==========================
-    //   Apply Final Filters
-    // ==========================
-    if (selectedState !== "all") powerData = powerData.filter(p => p.state === selectedState);
-    if (selectedFuel !== "all") powerData = powerData.filter(p => p.primary_fuel === selectedFuel);
-    if (selectedSubbasin !== "all") powerData = powerData.filter(p => p.subbasin === selectedSubbasin);
-
-    // ==========================
-    //   Collapse All
-    // ==========================
-    [stateSelect, fuelSelect, subbasinSelect].forEach(sel => sel && sel.removeAttribute('size'));
-
-    if (!powerData.length) return;
-
-    // ==========================
-    //   Clear Previous Layer
-    // ==========================
+    // --- Clear previous layer & markers ---
     clearPowerLayer();
-
-    const maxPower = Math.max(...powerData.map(p => parseFloat(p.total_mwh) || 1));
+    const maxPower = Math.max(...filteredForPlot.map(p => parseFloat(p.total_mwh) || 1));
 
     // HeatLayer
-    const heatPoints = powerData.map(p => [
+    const heatPoints = filteredForPlot.map(p => [
       p.lat,
       p.lon,
       (parseFloat(p.total_mwh) || 0) / maxPower * 0.02
@@ -863,7 +847,7 @@ async function loadPowerHeatmap(selectedState = "all", selectedFuel = "all", sel
 
     // Pulsating markers
     powerMarkers = [];
-    powerData.forEach(p => {
+    filteredForPlot.forEach(p => {
       const intensity = Math.min((parseFloat(p.total_mwh)||0)/maxPower, 1);
       const baseRadius = 4 + intensity * 10;
 
@@ -904,99 +888,106 @@ async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", se
     let carbonData = data.points || [];
     if (!carbonData.length) return;
 
-    // --- Filtered data for dropdown population ---
-    let filteredForDropdowns = carbonData;
-    if (selectedState !== "all") filteredForDropdowns = filteredForDropdowns.filter(p => p.state === selectedState);
+    // --- Apply filters for plotting only ---
+    let filteredForPlot = carbonData.slice();
+    if (selectedState !== "all") filteredForPlot = filteredForPlot.filter(p => p.state === selectedState);
+    if (selectedFuel !== "all") filteredForPlot = filteredForPlot.filter(p => p.primary_fuel === selectedFuel);
+    if (selectedSubbasin !== "all") filteredForPlot = filteredForPlot.filter(p => p.subbasin === selectedSubbasin);
 
-    // --- Populate State Dropdown ---
+    // --- Compute allowed values for dropdowns based on other selections ---
+    const filteredStates = [...new Set(
+      carbonData
+        .filter(p => (selectedFuel === "all" || p.primary_fuel === selectedFuel) &&
+                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+        .map(p => p.state).filter(Boolean)
+    )].sort();
+
+    const filteredFuels = [...new Set(
+      carbonData
+        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                     (selectedSubbasin === "all" || p.subbasin === selectedSubbasin))
+        .map(p => p.primary_fuel).filter(Boolean)
+    )].sort();
+
+    const filteredSubbasins = [...new Set(
+      carbonData
+        .filter(p => (selectedState === "all" || p.state === selectedState) &&
+                     (selectedFuel === "all" || p.primary_fuel === selectedFuel))
+        .map(p => p.subbasin).filter(Boolean)
+    )].sort();
+
+    // --- Populate STATE DROPDOWN ---
     const stateSelect = document.getElementById('state-filter');
     if (stateSelect) {
-      const allStates = [...new Set(carbonData.map(p => p.state).filter(Boolean))].sort();
       stateSelect.innerHTML = '';
-      stateSelect.size = 6;
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All States';
       allOption.selected = selectedState === 'all';
       stateSelect.appendChild(allOption);
 
-      allStates.forEach(state => {
+      filteredStates.forEach(s => {
         const option = document.createElement('option');
-        option.value = state;
-        option.text = state;
-        if (state === selectedState) option.selected = true;
+        option.value = s;
+        option.text = s;
+        if (s === selectedState) option.selected = true;
         stateSelect.appendChild(option);
       });
+      stateSelect.size = 1;
     }
 
-    // --- Populate Fuel Dropdown based on selected state ---
+    // --- Populate FUEL DROPDOWN ---
     const fuelSelect = document.getElementById('fuel-filter');
     if (fuelSelect) {
-      const allFuels = [...new Set(filteredForDropdowns.map(p => p.primary_fuel).filter(Boolean))].sort();
       fuelSelect.innerHTML = '';
-      fuelSelect.size = 6;
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All Fuels';
       allOption.selected = selectedFuel === 'all';
       fuelSelect.appendChild(allOption);
 
-      allFuels.forEach(fuel => {
+      filteredFuels.forEach(f => {
         const option = document.createElement('option');
-        option.value = fuel;
-        option.text = fuel;
-        if (fuel === selectedFuel) option.selected = true;
+        option.value = f;
+        option.text = f;
+        if (f === selectedFuel) option.selected = true;
         fuelSelect.appendChild(option);
       });
+      fuelSelect.size = 1;
     }
 
-    // --- Populate Subbasin Dropdown based on selected state + fuel ---
-    let filteredForSubbasin = filteredForDropdowns;
-    if (selectedFuel !== "all") filteredForSubbasin = filteredForSubbasin.filter(p => p.primary_fuel === selectedFuel);
-
+    // --- Populate SUBBASIN DROPDOWN ---
     const subbasinSelect = document.getElementById('subbasin-filter');
     if (subbasinSelect) {
-      const allSubbasins = [...new Set(filteredForSubbasin.map(p => p.subbasin).filter(Boolean))].sort();
       subbasinSelect.innerHTML = '';
-      subbasinSelect.size = 6;
-
       const allOption = document.createElement('option');
       allOption.value = 'all';
       allOption.text = 'All Subbasins';
       allOption.selected = selectedSubbasin === 'all';
       subbasinSelect.appendChild(allOption);
 
-      allSubbasins.forEach(sb => {
+      filteredSubbasins.forEach(sb => {
         const option = document.createElement('option');
         option.value = sb;
         option.text = sb;
         if (sb === selectedSubbasin) option.selected = true;
         subbasinSelect.appendChild(option);
       });
+      subbasinSelect.size = 1;
     }
-
-    // --- Apply final filters for plotting ---
-    if (selectedState !== "all") carbonData = carbonData.filter(p => p.state === selectedState);
-    if (selectedFuel !== "all") carbonData = carbonData.filter(p => p.primary_fuel === selectedFuel);
-    if (selectedSubbasin !== "all") carbonData = carbonData.filter(p => p.subbasin === selectedSubbasin);
-
-    // --- Collapse dropdowns ---
-    [stateSelect, fuelSelect, subbasinSelect].forEach(sel => sel && sel.removeAttribute('size'));
-
-    if (!carbonData.length) return;
 
     // --- Clear previous heat & markers ---
     if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
     carbonMarkers.forEach(m => map.removeLayer(m));
     carbonMarkers = [];
 
-    const maxCarbon = Math.max(...carbonData.map(p => parseFloat(p.carbon_footprint) || 1));
+    if (!filteredForPlot.length) return;
 
-    const heatPoints = carbonData.map(p => {
+    const maxCarbon = Math.max(...filteredForPlot.map(p => parseFloat(p.carbon_footprint) || 1));
+
+    const heatPoints = filteredForPlot.map(p => {
       const raw = parseFloat(p.carbon_footprint) || 0;
-      let normalized = Math.min((raw / maxCarbon) * 100, 1);
+      const normalized = Math.min((raw / maxCarbon) * 100, 1);
       return [p.lat, p.lon, normalized];
     });
 
@@ -1007,9 +998,9 @@ async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", se
       gradient: {0:'#00ff00', 0.4:'#ffff00', 0.7:'#ff5500', 1:'#ff0000'}
     }).addTo(map);
 
-    carbonData.forEach(p => {
+    filteredForPlot.forEach(p => {
       const raw = parseFloat(p.carbon_footprint) || 0;
-      let normalized = Math.min((raw / maxCarbon) * 100, 1);
+      const normalized = Math.min((raw / maxCarbon) * 100, 1);
       const colorIntensity = `rgba(255,0,0,${0.6 + 0.4*normalized})`;
       const marker = L.circleMarker([p.lat, p.lon], {
         radius: 5,
@@ -1018,17 +1009,23 @@ async function loadCarbonHeatmap(selectedState = "all", selectedFuel = "all", se
         fillOpacity: 0.8,
         weight: 0.5
       }).addTo(map)
-        .bindTooltip(`CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`, {direction:'top', className:'aqi-tooltip'});
+        .bindTooltip(
+          `CO₂: ${p.carbon_footprint.toLocaleString()} kg/MWh\nSubbasin: ${p.subbasin}\nFuel: ${p.primary_fuel}`,
+          {direction:'top', className:'aqi-tooltip'}
+        );
       carbonMarkers.push(marker);
     });
 
-    document.getElementById('footer-timestamp').innerText = `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+    document.getElementById('footer-timestamp').innerText =
+      `Updated: ${new Date(data.timestamp).toLocaleString()}`;
+
     setLegend('co2');
 
   } catch(err) {
     console.error('Error loading carbon heatmap:', err);
   }
 }
+
 
 
 // Track currently active layer
