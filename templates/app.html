@@ -500,53 +500,45 @@ function setLegend(layer){
 }
 
 // --- Load Data Centers ---
-async function loadDataCenters(){
+async function loadDataCenters() {
   try {
     const res = await fetch('https://data-center-map-nu1d.onrender.com/api/monitors');
     const data = await res.json();
-    if(!data.data_centers || data.data_centers.length === 0) return;
+    if (!data.data_centers || data.data_centers.length === 0) return;
 
     // Remove old markers
     dcMarkers.forEach(m => map.removeLayer(m));
     dcMarkers = [];
 
     data.data_centers.forEach(dc => {
-      if(!dc.lat || !dc.lon) return;
+      if (!dc.lat || !dc.lon) return;
 
       const marker = L.marker([Number(dc.lat), Number(dc.lon)], {
         icon: L.divIcon({
-          className:'dc-icon',
-          html:`<i class="fas fa-database" style="color:cyan;font-size:12px;"></i>`
+          className: 'dc-icon',
+          html: `<i class="fas fa-database" style="color:cyan;font-size:12px;"></i>`
         })
       }).addTo(map);
 
-      marker.on('mouseover', ()=> {
+      marker.on('mouseover', () => {
         const tab = document.getElementById('dc-info-tab');
-        tab.style.display='flex';
-        document.getElementById('dc-name').innerText = dc.name || 'N/A';
-        document.getElementById('dc-operator').innerText = dc.operator || 'N/A';
-        document.getElementById('dc-power').innerText = dc.powerSource || 'N/A';
-        document.getElementById('dc-cooling').innerText = dc.coolingSource || 'N/A';
-        document.getElementById('dc-city').innerText = dc.city || 'N/A';
-        document.getElementById('dc-state').innerText = dc.state || 'N/A';
-        document.getElementById('dc-size').innerText = dc.propertySizeAcres || 'N/A';
-        document.getElementById('dc-cost').innerText = dc.projectCost || 'N/A';
-        document.getElementById('dc-status').innerText = dc.status || 'N/A';
+        tab.style.display = 'flex';
+        document.getElementById('dc-name').innerText = dc.Name || 'N/A';
+        document.getElementById('dc-operator').innerText = dc.Operator || 'N/A';
+        document.getElementById('dc-power').innerText = dc.PowerSource || 'N/A';
+        document.getElementById('dc-cooling').innerText = dc.CoolingSource || 'N/A';
+        document.getElementById('dc-city').innerText = dc.City || 'N/A';
+        document.getElementById('dc-state').innerText = dc.State || 'N/A';
+        document.getElementById('dc-size').innerText = dc.PropertySizeAcres || 'N/A';
+        document.getElementById('dc-cost').innerText = dc.ProjectCost || 'N/A';
+        document.getElementById('dc-status').innerText = dc.Status || 'N/A';
       });
 
       dcMarkers.push(marker);
     });
 
-    // Fit bounds only after initial load
-    if(!initialLoad && dcMarkers.length>0){
-      const group = new L.featureGroup(dcMarkers);
-      map.fitBounds(group.getBounds().pad(0.2));
-    }
-
-    initialLoad = false;
-
-  } catch(err){
-    console.error(err);
+  } catch (error) {
+    console.error('Error loading data centers:', error);
   }
 }
 
