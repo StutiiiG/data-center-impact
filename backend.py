@@ -333,13 +333,13 @@ def get_water_fuel():
         # Drop rows with NaN or zero water footprint
         df = df[df['water_footprint'].notna() & (df['water_footprint'] > 0)]
 
-        # Drop rows with NaN fuel_code
-        df = df[df['fuel_code'].notna() & (df['fuel_code'].str.strip() != "")]
+        # Drop rows with NaN primary_fuel
+        df = df[df['primary_fuel'].notna() & (df['primary_fuel'].str.strip() != "")]
 
-        # Aggregate by fuel_code and sort descending
-        aggregation_result = df.groupby('fuel_code')['water_footprint'].sum().sort_values(ascending=False)
+        # Aggregate by primary_fuel and sort descending
+        aggregation_result = df.groupby('primary_fuel')['water_footprint'].sum().sort_values(ascending=False)
 
-        # Drop NaN fuel_codes just in case
+        # Drop NaN primary_fuels just in case
         aggregation_result_cleaned = aggregation_result.dropna(axis=0)
 
         # Convert to list of dicts in the requested format
@@ -361,8 +361,8 @@ def get_carbon_fuel():
         df = pd.read_csv(CARBON_CSV)
         df['carbon_footprint'] = pd.to_numeric(df['carbon_footprint'], errors='coerce')
         df = df[df['carbon_footprint'].notna() & (df['carbon_footprint'] > 0)]
-        df = df[df['fuel_code'].notna() & (df['fuel_code'].str.strip() != "")]
-        aggregation_result = df.groupby('fuel_code')['carbon_footprint'].sum().sort_values(ascending=False)
+        df = df[df['primary_fuel'].notna() & (df['primary_fuel'].str.strip() != "")]
+        aggregation_result = df.groupby('primary_fuel')['carbon_footprint'].sum().sort_values(ascending=False)
         aggregation_result_cleaned = aggregation_result.dropna(axis=0)
         carbon_data = [
             {"primary_fuel": fuel, "carbon_footprint": float(round(cf, 2))}
