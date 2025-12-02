@@ -216,22 +216,19 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   color: #e0e0e0;
 }
 
-/* Navigation Ribbon */
 #nav-ribbon {
-  height: 60px; /* taller */
-  line-height: 60px; /* vertically center items */
+  height: 70px;        /* taller ribbon */
+  line-height: 70px;   /* vertically center items */
   background: #1a3c54;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
 }
-
 .nav-item {
-  font-size: 1.1rem; /* slightly bigger nav options */
-  padding: 0 18px;
-  line-height: 60px; /* match ribbon height */
+  padding: 0 24px;     /* just horizontal spacing, vertical auto-centered via line-height */
 }
+  
 .nav-item:hover { background:rgba(255,255,255,0.1); border-radius:6px; }
 .nav-item.active { border-bottom:3px solid #6EC1E4; }
 
