@@ -414,6 +414,23 @@ html, body { height:100%; margin:0; font-family:'Inter',sans-serif; overflow:hid
   <div id="graph-title" style="font-weight:600; font-size:1.2rem; margin-bottom:10px;">Fuel Type Analysis</div>
   <div id="graph-placeholder">Graph Placeholder</div>
 </div>
+<style>
+  /* Full overlay covering the map */
+  #summary-overlay {
+    position: absolute;
+    top: 120px; /* adjust to map header */
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 550;
+    background: #111827;
+    display: none; /* initially hidden */
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  /* Update this section in your main <style> block or the injected <style> block */
+
 /* 2x2 grid for charts */
 #summary-grid {
   display: grid;
