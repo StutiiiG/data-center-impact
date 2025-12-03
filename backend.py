@@ -12,8 +12,8 @@ from numbers_parser import Document
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MONITOR_CSV = os.path.abspath('annual_conc_by_monitor_2025.csv')
 DC_CSV = os.path.abspath('data/Data_Centers_Database - Data Centers.csv')
-WATER_CSV = os.path.abspath('data/final_footprint_dataset (1).csv')
-CARBON_CSV = os.path.abspath('data/final_footprint_dataset (1).csv')
+WATER_CSV = os.path.abspath('final_footprint_dataset.csv')
+CARBON_CSV = os.path.abspath('final_footprint_dataset.csv')
 IMPACT_CSV = os.path.abspath('data/dc_impact_summary.csv')
 
 # --- Global variables ---
