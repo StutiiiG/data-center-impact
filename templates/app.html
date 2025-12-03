@@ -1683,11 +1683,8 @@ function hideMapControls() {
 }
 
 function showMapControls() {
-  // Reset visibility for map layers
-  // The nav ribbon click handler will handle monitor/insights visibility based on 'currentLayer'
-  document.getElementById('state-filter').style.display = 'block';
-  document.getElementById('fuel-filter').style.display = 'block';
-  document.getElementById('subbasin-filter').style.display = 'block';
+  // The filters visibility is now controlled *only* by showPanelsFor / toggleFiltersForLayer
+  // This function is intentionally left empty to fix the bug where filters reappear on the 'air' layer.
 }
 
 
