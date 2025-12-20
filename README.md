@@ -16,6 +16,24 @@ The goal is to support comparative analysis, spatial exploration, and scenario r
 
 ---
 
+## Key Definitions and Data Interpretation 
+
+Power (Electricity Consumption)
+Estimated electricity demand attributed to data center operations and supplied by regional power grids.
+
+Carbon Footprint
+CO₂-equivalent emissions associated with electricity generation used by data centers, calculated using grid-level carbon intensity factors.
+
+Water Footprint
+Water consumed by power generation and cooling processes required to supply electricity to data centers.
+
+Air Quality (AQI)
+Ambient air quality conditions (PM2.5, Ozone) near data center regions, based on public monitoring data. AQI values provide environmental context and are not direct emissions from data centers.
+
+Important: All metrics represent indirect, upstream impacts from electricity generation, not on-site data center measurements.
+
+---
+
 ## Features
 
 ### 🌫️ Air Quality Layer (Air)
