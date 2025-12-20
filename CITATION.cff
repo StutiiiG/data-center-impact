@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+title: "Environmental Risk Around US Data Centers"
+message: "If you use this software or derived datasets, please cite it as below."
+type: software
+
+authors:
+  - family-names: "Gaonkar"
+    given-names: "Stuti"
+
+repository-code: "https://github.com/StutiiiG/data-center-impact"
+url: "https://data-center-map-nu1d.onrender.com/"
+
+abstract: >
+  An interactive visualization framework for exploring indirect environmental
+  impacts associated with data center electricity demand in the United States,
+  including power consumption, carbon emissions, water footprint, and ambient
+  air quality. The project integrates public datasets and scenario-based
+  projections to support spatial and comparative analysis.
+
+keywords:
+  - data centers
+  - environmental impact
+  - electricity grids
+  - carbon emissions
+  - water footprint
+  - air quality
+  - geospatial visualization
+
+license: MIT
+
+preferred-citation:
+  type: software
+  authors:
+    - family-names: "Gaonkar"
+      given-names: "Stuti"
+  title: "Environmental Risk Around US Data Centers"
+  year: 2025
+  url: "https://github.com/StutiiiG/data-center-impact"
