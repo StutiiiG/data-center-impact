@@ -137,7 +137,7 @@ Important: All metrics represent indirect, upstream impacts from electricity gen
 Clone the repository:
 
 ```bash
-git clone https://github.com/sharashankr/data-center-map.git
+git clone https://github.com/StutiiiG/data-center-map.git
 cd data-center-map
 ````
 
@@ -208,6 +208,8 @@ These datasets provide estimates of electricity consumption, water usage, and ca
 AirNow (U.S. EPA)
 https://www.airnow.gov/
 AQI data is used to represent ambient air quality conditions (e.g., PM2.5 and Ozone) in regions surrounding data center locations.
+
+Only light preprocessing was performed, including unit normalization, basic geographic validation, removal of incomplete records, and aggregation for visualization. No additional modeling or causal inference was applied beyond the source datasets.
 
 **Future Projections (Carbon and Water):**
 
