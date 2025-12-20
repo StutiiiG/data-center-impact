@@ -144,8 +144,6 @@ Make sure the frontend API URLs match your backend environment (local vs deploye
 - **Link:** https://www.airnow.gov/  
 - **Description:** Public air quality monitoring data used to represent ambient conditions (e.g., PM2.5 and Ozone) in regions surrounding data center locations.
 
----
-
 ### Future Projections (Carbon and Water)
 
 - **Source:** *US-AI-Server-Analysis* (PEESE Group)  
@@ -154,11 +152,6 @@ Make sure the frontend API URLs match your backend environment (local vs deploye
 
 ---
 
-### Data Processing Notes
-
-Only light preprocessing was performed, including unit normalization, basic geographic validation, removal of incomplete records, and aggregation for visualization. No additional modeling or causal inference was applied beyond what is provided in the original source datasets.
-
----
 ## Reuse and Extension 
 
 To reuse or extend this project:
