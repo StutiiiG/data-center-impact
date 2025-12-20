@@ -34,78 +34,13 @@ Ambient air quality conditions (PM2.5, Ozone) near data center regions, based on
 
 ---
 
-## Features
+## Core Capabilities
 
-### 🌫️ Air Quality Layer (Air)
-
-- Visualizes **Air Quality Index (AQI)** conditions across the United States using monitored pollutants:
-  - Ozone  
-  - PM2.5  
-  - Combined “Ozone and PM2.5”
-- **Two viewing modes**:
-  - **Plot by Facility** – individual monitoring stations as colored points  
-  - **Plot by State Average** – each state filled with its average AQI for quick regional comparison
-- **Interactions**:
-  - Hover hotspots to see AQI values  
-  - Use the **Monitor Layer** panel to switch between Ozone + PM2.5, Ozone only, and PM2.5 only  
-  - Zoom and pan to inspect pollution around specific data centers  
-
----
-
-### 💧 Water Footprint Layer (Water)
-
-- Shows **water footprint (m³/MWh)** associated with the electricity and cooling requirements of data centers  
-- Marker **color and size** represent the intensity of water usage  
-- **View options (top-right filters)**:
-  - **State** – focus on all states (default) or a selected state  
-  - **Fuel** – filter by electricity source (e.g., natural gas, coal, hydro, solar)  
-  - **PCA** – group impacts by power control areas (regional electricity supply zones)  
-  - **Plot by Facility** – individual facilities sized/colored by impact  
-  - **Plot by State Average** – states colored by average water footprint  
-- **More Insights panel**:
-  - **Best vs Worst Water Projections** – how future footprint changes under efficient vs inefficient practices  
-  - **Fuel Type Breakdown** – which electricity sources drive the highest water consumption  
-
----
-
-### ⚡ Power Consumption Layer (Power)
-
-- Visualizes **total electricity consumption (MWh)** by power facilities feeding data centers  
-- Color and circle size indicate magnitude of power usage  
-- **View options** (same control scheme as Water):
-  - State / Fuel / PCA filters  
-  - Plot by Facility vs Plot by State Average  
-- **Tooltips** on hover show:
-  - Power consumption (MWh)  
-  - Primary fuel type  
-  - Regional sub-basin supplying electricity  
-
----
-
-### 🌍 CO₂ Emissions Layer (CO2)
-
-- Maps **carbon emissions (kg/MWh)** from electricity used by data centers  
-- Uses a heat-style color scale (low → high CO₂ intensity)  
-- **View options**:
-  - Filter by **State**, **Fuel**, and **PCA**  
-  - Toggle between facility-level view and state-level averages  
-- **Tooltips** on hover show:
-  - Emissions intensity (kg/MWh)  
-  - Regional sub-basin  
-  - Primary generation fuel  
-- **More Insights panel**:
-  - **Best vs Worst Carbon Projections** – scenario analysis of decarbonization vs business-as-usual  
-  - **Fuel Type Contribution** – CO₂ emissions contribution by electricity source  
-
----
-
-### 🏢 Data Centers Summary
- 
-- This view shows aggregated charts of:
-  - Status breakdown  
-  - State distribution  
-  - Operator distribution  
-  - Size buckets  
+- Multi-layer visualization of environmental impacts linked to data center electricity demand
+- Comparative analysis across air quality, water footprint, power consumption, and carbon emissions
+- Facility-level and state-level aggregation for spatial analysis
+- Scenario-based projections for future water and carbon impacts
+- Interactive geospatial exploration using consistent filtering across layers
 
 ---
 
