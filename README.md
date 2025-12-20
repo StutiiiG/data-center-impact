@@ -6,6 +6,13 @@ An interactive web application that visualizes the environmental impact of data 
 View it here: https://data-center-map-nu1d.onrender.com/
 
 ---
+## What this Project does
+
+-This project is an exploratory visualization tool designed to analyze indirect environmental impacts associated with data center electricity demand across the United States.
+
+-The application does not measure emissions, water use, or air pollution directly from individual data centers. Instead, it visualizes impacts derived from regional electricity generation and supporting infrastructure that supply power to data centers.
+
+-The goal is to support comparative analysis, spatial exploration, and scenario reasoning, rather than causal attribution or forecasting.
 
 ## Features
 
