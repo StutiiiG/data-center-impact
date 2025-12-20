@@ -72,7 +72,7 @@ Ambient air quality conditions (PM2.5, Ozone) near data center regions, based on
 Clone the repository:
 
 ```bash
-git clone https://github.com/StutiiiG/data-center-map.git
+git clone https://github.com/StutiiiG/data-center-impact.git
 cd data-center-map
 ````
 
