@@ -169,6 +169,13 @@ The visualization framework is intentionally modular to support additional envir
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
+---
+## Citation
+
+If you use this project or derived datasets in academic or applied work,
+please cite it using the provided `CITATION.cff` file.
+
+
 
 
 
