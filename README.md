@@ -73,7 +73,7 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/StutiiiG/data-center-impact.git
-cd data-center-map
+cd data-center-impact
 ````
 
 Create and activate a virtual environment:
