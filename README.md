@@ -6,13 +6,13 @@ An interactive web application that visualizes the environmental impact of data 
 View it here: https://data-center-map-nu1d.onrender.com/
 
 ---
-## What this Project does
+## What This Project Does
 
 This project is an exploratory visualization tool designed to analyze indirect environmental impacts associated with data center electricity demand across the United States.
 
 The application does not measure emissions, water use, or air pollution directly from individual data centers. Instead, it visualizes impacts derived from regional electricity generation and supporting infrastructure that supply power to data centers.
 
-The goal is to support comparative analysis, spatial exploration, and scenario reasoning, rather than causal attribution or forecasting.
+The goal is to support comparative analysis, spatial exploration, and scenario reasoning—not causal attribution or precise forecasting.
 
 ---
 
@@ -30,7 +30,7 @@ Water consumed by power generation and cooling processes required to supply elec
 ### Air Quality (AQI)
 Ambient air quality conditions (PM2.5, Ozone) near data center regions, based on public monitoring data. AQI values provide environmental context and are not direct emissions from data centers.
 
-### Important: All metrics represent indirect, upstream impacts from electricity generation, not on-site data center measurements.
+**Important:** All metrics represent indirect, upstream impacts from electricity generation, not on-site data center measurements.
 
 ---
 
@@ -157,12 +157,9 @@ Only light preprocessing was performed, including unit normalization, basic geog
 ## Reuse and Extension 
 
 To reuse or extend this project:
-
- - Replace or add datasets in the data directory
-
- - Update aggregation logic in the backend to support new metrics
-
- - Add new layers following the existing Leaflet + filter pattern
+- Replace or add datasets in the `data/` directory
+- Update backend aggregation logic to support new metrics or resolutions
+- Add new map layers following the existing Leaflet + filtering pattern
 
 The visualization framework is intentionally modular to support additional environmental or infrastructure datasets.
 
