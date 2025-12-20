@@ -72,18 +72,9 @@ View it here: https://data-center-map-nu1d.onrender.com/
 
 ---
 
-### 🏢 Data Centers Overlay & Summary
-
-- White icons on the map mark **data center locations**; icon size reflects **facility size**  
-- Clicking a data center reveals:
-  - Name, operator  
-  - Size in acres  
-  - Power source  
-  - Cooling source  
-  - City, state  
-  - Project cost  
-  - Status (e.g., operational, planned)  
-- A separate **Data Centers Summary** view shows aggregated charts:
+### 🏢 Data Centers Summary
+ 
+- This view shows aggregated charts of:
   - Status breakdown  
   - State distribution  
   - Operator distribution  
