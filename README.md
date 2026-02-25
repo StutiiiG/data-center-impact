@@ -6,7 +6,7 @@ An interactive web application that visualizes the environmental impact of data 
 ## Dashboard Preview
 
 <p align="center">
-  <img src="assets/data-center-map.png" alt="US Data Center Environmental Risk Dashboard" width="900"/>
+  <img src="assests/data-center-map.png" alt="US Data Center Environmental Risk Dashboard" width="900"/>
 </p>
 
 ##  Business Question
