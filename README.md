@@ -19,7 +19,6 @@ This project answers:
 
 The goal is to move beyond raw metrics and provide a data-driven risk lens to support responsible digital infrastructure planning.
 
----
 
 ## What This Project Does
 
@@ -34,8 +33,6 @@ The goal is to support:
 - scenario reasoning  
 
 —not causal attribution or precise forecasting.
-
----
 
 ## Key Definitions and Data Interpretation 
 
