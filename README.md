@@ -9,7 +9,18 @@ An interactive web application that visualizes the environmental impact of data 
   <img src="assets/data-center-map.png" alt="US Data Center Environmental Risk Dashboard" width="900"/>
 </p>
 
+##  Business Question
+
+As hyperscale data centers expand rapidly across the United States, understanding their localized environmental impact is critical for urban planners, sustainability teams, and infrastructure investors.
+
+This project answers:
+
+**Which U.S. regions face the highest environmental risk from data center expansion, and what underlying factors drive that risk?**
+
+The goal is to move beyond raw metrics and provide a data-driven risk lens to support responsible digital infrastructure planning.
+
 ---
+
 ## What This Project Does
 
 This project is an exploratory visualization tool designed to analyze indirect environmental impacts associated with data center electricity demand across the United States.
@@ -45,6 +56,25 @@ Ambient air quality conditions (PM2.5, Ozone) near data center regions, based on
 - Interactive geospatial exploration using consistent filtering across layers
 
 ---
+
+##  Key Insights
+
+- Western states exhibit significantly higher **water stress exposure**, indicating potential sustainability constraints for future data center growth.
+- Regions with **carbon-intensive energy grids** show elevated environmental risk despite similar compute capacity.
+- Data centers located near dense urban corridors demonstrate higher **air quality sensitivity**, suggesting increased regulatory and community risk.
+- Composite risk scoring reveals clear geographic clustering of high-risk zones rather than uniform national distribution.
+
+These findings highlight the importance of multi-factor environmental evaluation when planning large-scale digital infrastructure.
+
+##  Quantitative Validation
+
+To ensure the composite risk signal was meaningful:
+
+- Feature correlation analysis confirmed non-redundant contribution of environmental factors
+- Sensitivity testing showed stable regional rankings under moderate weight perturbations
+- Risk score distribution exhibited strong geographic separation between low- and high-impact regions
+
+These checks provide confidence that the risk index captures meaningful environmental variation rather than visualization artifacts.
 
 ## Tech Stack
 
