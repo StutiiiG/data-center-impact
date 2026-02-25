@@ -59,12 +59,15 @@ Ambient air quality conditions (PM2.5, Ozone) near data center regions, based on
 
 ##  Key Insights
 
-- Western states exhibit significantly higher **water stress exposure**, indicating potential sustainability constraints for future data center growth.
-- Regions with **carbon-intensive energy grids** show elevated environmental risk despite similar compute capacity.
-- Data centers located near dense urban corridors demonstrate higher **air quality sensitivity**, suggesting increased regulatory and community risk.
-- Composite risk scoring reveals clear geographic clustering of high-risk zones rather than uniform national distribution.
+- Data center clusters in regions with carbon-intensive electricity grids (e.g., parts of the Midwest and South) exhibit higher indirect emissions exposure compared to regions powered by cleaner energy mixes.
 
-These findings highlight the importance of multi-factor environmental evaluation when planning large-scale digital infrastructure.
+- Water stress risk is unevenly distributed across the U.S., with several fast-growing data center markets located in moderately to highly water-stressed regions, indicating potential sustainability constraints.
+
+- Spatial analysis shows that environmental impact is driven more strongly by **regional energy mix** than by the raw count of data centers alone.
+
+- High-density data center corridors reveal compounding environmental pressure when elevated power demand coincides with poor regional air quality baselines.
+
+These findings highlight the importance of region-aware infrastructure planning rather than uniform national expansion strategies.
 
 ##  Quantitative Validation
 
