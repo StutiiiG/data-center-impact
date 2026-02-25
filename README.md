@@ -23,11 +23,17 @@ The goal is to move beyond raw metrics and provide a data-driven risk lens to su
 
 ## What This Project Does
 
-This project is an exploratory visualization tool designed to analyze indirect environmental impacts associated with data center electricity demand across the United States.
+This project is an exploratory visualization and analytics tool designed to analyze **indirect environmental impacts** associated with data center electricity demand across the United States.
 
-The application does not measure emissions, water use, or air pollution directly from individual data centers. Instead, it visualizes impacts derived from regional electricity generation and supporting infrastructure that supply power to data centers.
+The application does **not** measure emissions, water use, or air pollution directly from individual data centers. Instead, it visualizes impacts derived from **regional electricity generation and supporting infrastructure** that supply power to data centers.
 
-The goal is to support comparative analysis, spatial exploration, and scenario reasoning—not causal attribution or precise forecasting.
+The goal is to support:
+
+- comparative analysis  
+- spatial exploration  
+- scenario reasoning  
+
+—not causal attribution or precise forecasting.
 
 ---
 
@@ -84,7 +90,6 @@ The analysis integrates geospatial data center locations with regional environme
 - Performed correlation analysis to understand relationships between environmental factors  
 - Conducted regional comparisons to identify geographic concentration of risk drivers  
 - Built interactive visualizations to support spatial reasoning and scenario exploration  
-
 
 ##  Quantitative Validation
 
