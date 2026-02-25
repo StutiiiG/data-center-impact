@@ -69,6 +69,23 @@ Ambient air quality conditions (PM2.5, Ozone) near data center regions, based on
 
 These findings highlight the importance of region-aware infrastructure planning rather than uniform national expansion strategies.
 
+#  Analytical Methodology
+
+The analysis integrates geospatial data center locations with regional environmental indicators to enable comparative risk exploration.
+
+**Data Integration**
+
+- Mapped U.S. data center locations to regional electricity and environmental datasets  
+- Combined air quality index, water stress indicators, power consumption proxies, and carbon intensity signals  
+- Standardized heterogeneous features using min-max normalization for cross-factor comparison  
+
+**Exploratory Analysis**
+
+- Performed correlation analysis to understand relationships between environmental factors  
+- Conducted regional comparisons to identify geographic concentration of risk drivers  
+- Built interactive visualizations to support spatial reasoning and scenario exploration  
+
+
 ##  Quantitative Validation
 
 To ensure the composite risk signal was meaningful:
